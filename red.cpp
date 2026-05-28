@@ -15,7 +15,7 @@ Red::~Red() {
     for (auto& enrutador : enrutadores) delete enrutador.second;
 }
 
-// ─── agregarEnrutador ─────────────────────────────────────────────────────────
+
 void Red::agregarEnrutador(const std::string& nombre) {
     if (nombre.empty()) {
         std::cerr << "[Error] El nombre del enrutador no puede estar vacío.\n";
@@ -28,14 +28,14 @@ void Red::agregarEnrutador(const std::string& nombre) {
     enrutadores[nombre] = new Enrutador(nombre);
 }
 
-// ─── eliminarEnrutador ────────────────────────────────────────────────────────
+
 void Red::eliminarEnrutador(const std::string& nombre) {
     auto it = enrutadores.find(nombre);
     if (it == enrutadores.end()) {
         std::cerr << "[Error] El enrutador '" << nombre << "' no existe.\n";
         return;
     }
-    // Quitar este nodo de los vecinos de todos los demás
+
     for (auto& [nombreVecino, enrutadorVecino] : enrutadores) {
         if (nombreVecino != nombre)
             enrutadorVecino->eliminarVecino(it->second);
@@ -44,7 +44,7 @@ void Red::eliminarEnrutador(const std::string& nombre) {
     enrutadores.erase(it);
 }
 
-// ─── actualizarEnlace ─────────────────────────────────────────────────────────
+
 void Red::actualizarEnlace(const std::string& origen,
                            const std::string& destino,
                            int costo) {
@@ -72,7 +72,7 @@ void Red::actualizarEnlace(const std::string& origen,
     itDestino->second->agregarVecino(itOrigen->second, costo);
 }
 
-// ─── calcularCosto ────────────────────────────────────────────────────────────
+
 int Red::calcularCosto(const std::string& origen, const std::string& destino) {
     if (enrutadores.find(origen) == enrutadores.end()) {
         std::cerr << "[Error] Enrutador origen '" << origen << "' no existe.\n";
@@ -84,7 +84,7 @@ int Red::calcularCosto(const std::string& origen, const std::string& destino) {
     }
     if (origen == destino) return 0;
 
-    // Inicializar Dijkstra
+
     for (auto& [nombre, enrutador] : enrutadores) {
         enrutador->distancia = std::numeric_limits<int>::max();
         enrutador->visitado  = false;
@@ -106,7 +106,7 @@ int Red::calcularCosto(const std::string& origen, const std::string& destino) {
         actual->visitado = true;
 
         for (const auto& [vecino, costo] : actual->vecinos) {
-            // Guardia contra desbordamiento de enteros
+
             if (actual->distancia != std::numeric_limits<int>::max()) {
                 int nuevaDist = actual->distancia + costo;
                 if (nuevaDist < vecino->distancia) {
@@ -121,7 +121,7 @@ int Red::calcularCosto(const std::string& origen, const std::string& destino) {
     return enrutadores[destino]->distancia;
 }
 
-// ─── obtenerRuta ──────────────────────────────────────────────────────────────
+
 std::vector<std::string> Red::obtenerRuta(const std::string& origen,
                                           const std::string& destino) {
     std::vector<std::string> ruta;
@@ -136,7 +136,6 @@ std::vector<std::string> Red::obtenerRuta(const std::string& origen,
         return ruta;
     }
 
-    // Re-ejecutar Dijkstra para tener los punteros 'anterior' actualizados
     int costo = calcularCosto(origen, destino);
     if (costo == std::numeric_limits<int>::max() || costo < 0) {
         std::cout << "[Info] No existe ruta entre '" << origen
@@ -145,7 +144,7 @@ std::vector<std::string> Red::obtenerRuta(const std::string& origen,
     }
 
     Enrutador* actual = enrutadores[destino];
-    // Protección contra ciclos (no debería ocurrir, pero por seguridad)
+
     int pasos = 0;
     int maxPasos = static_cast<int>(enrutadores.size()) + 1;
     while (actual != nullptr && pasos <= maxPasos) {
@@ -157,7 +156,7 @@ std::vector<std::string> Red::obtenerRuta(const std::string& origen,
     return ruta;
 }
 
-// ─── cargarDesdeArchivo ───────────────────────────────────────────────────────
+
 void Red::cargarDesdeArchivo(const std::string& nombreArchivo) {
     if (nombreArchivo.empty()) {
         std::cerr << "[Error] Nombre de archivo vacío.\n";
@@ -177,7 +176,7 @@ void Red::cargarDesdeArchivo(const std::string& nombreArchivo) {
 
     while (std::getline(archivo, linea)) {
         ++lineaNum;
-        if (linea.empty() || linea[0] == '#') continue; // comentarios/blancos
+        if (linea.empty() || linea[0] == '#') continue;
 
         std::istringstream ss(linea);
         std::string origen, destino;
@@ -209,7 +208,7 @@ void Red::cargarDesdeArchivo(const std::string& nombreArchivo) {
     std::cout << "[OK] Archivo cargado: " << cargadas << " enlace(s) procesado(s).\n";
 }
 
-// ─── generarRedAleatoria ──────────────────────────────────────────────────────
+
 void Red::generarRedAleatoria(int numeroEnrutadores) {
     if (numeroEnrutadores <= 0) {
         std::cerr << "[Error] El numero de enrutadores debe ser positivo.\n";
@@ -227,7 +226,7 @@ void Red::generarRedAleatoria(int numeroEnrutadores) {
         agregarEnrutador(nodoStr);
     }
 
-    // Garantizar conectividad: cadena base A-B-C-...-Z
+
     for (int i = 0; i < numeroEnrutadores - 1; ++i) {
         std::string n1(1, static_cast<char>('A' + i));
         std::string n2(1, static_cast<char>('A' + i + 1));
@@ -235,7 +234,7 @@ void Red::generarRedAleatoria(int numeroEnrutadores) {
         actualizarEnlace(n1, n2, costo);
     }
 
-    // Agregar enlaces adicionales aleatorios
+
     for (int i = 0; i < numeroEnrutadores; ++i) {
         for (int j = i + 1; j < numeroEnrutadores; ++j) {
             if (rand() % 2 == 0) {
@@ -248,7 +247,7 @@ void Red::generarRedAleatoria(int numeroEnrutadores) {
     }
 }
 
-// ─── imprimirTablaVecinos ─────────────────────────────────────────────────────
+
 void Red::imprimirTablaVecinos() {
     if (enrutadores.empty()) {
         std::cout << "[Aviso] La red está vacia.\n";
@@ -270,7 +269,7 @@ void Red::imprimirTablaVecinos() {
     std::cout << "========================\n";
 }
 
-// ─── eliminarConexion ─────────────────────────────────────────────────────────
+
 void Red::eliminarConexion(const std::string& origen,
                            const std::string& destino) {
     auto itOrigen  = enrutadores.find(origen);

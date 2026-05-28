@@ -9,9 +9,7 @@
 
 using namespace std;
 
-// ─── Utilidades de lectura segura ─────────────────────────────────────────────
 
-// Lee un entero; si la entrada es inválida limpia el buffer y repite.
 int leerEntero(const string& prompt) {
     int valor;
     while (true) {
@@ -26,7 +24,7 @@ int leerEntero(const string& prompt) {
     }
 }
 
-// Lee un entero positivo (> 0).
+
 int leerEnteroPositivo(const string& prompt) {
     int valor;
     while (true) {
@@ -36,7 +34,7 @@ int leerEnteroPositivo(const string& prompt) {
     }
 }
 
-// Lee exactamente una letra (a-z / A-Z) y la convierte a mayúscula.
+
 string leerNodoLetra(const string& prompt) {
     string entrada;
     while (true) {
@@ -51,7 +49,7 @@ string leerNodoLetra(const string& prompt) {
     }
 }
 
-// Lee un entero dentro de un rango [min, max].
+
 int leerOpcion(const string& prompt, int minVal, int maxVal) {
     int valor;
     while (true) {
@@ -62,10 +60,7 @@ int leerOpcion(const string& prompt, int minVal, int maxVal) {
     }
 }
 
-// ─── Helpers de menú ──────────────────────────────────────────────────────────
 
-// Pide dos nodos distintos y valida que existan en la red.
-// Retorna false si alguno no existe.
 bool pedirDosNodosExistentes(const Red& red,
                              const string& promptA, const string& promptB,
                              string& nodoA, string& nodoB) {
@@ -87,13 +82,11 @@ bool pedirDosNodosExistentes(const Red& red,
     return true;
 }
 
-// ─── Main ─────────────────────────────────────────────────────────────────────
 
 int main() {
     Red red;
 
-    // ── Menú inicial ──────────────────────────────────────────────────────────
-    int opcionInicial = leerOpcion(
+      int opcionInicial = leerOpcion(
         "\nModelar una red manualmente (1), generar aleatoriamente (2), "
         "cargar por archivo (3): ", 1, 3);
 
@@ -101,7 +94,7 @@ int main() {
         int n = leerEnteroPositivo("Cantidad de nodos a generar: ");
         if (n > 26) {
             cout << "[Aviso] Se limita a 26 nodos (una letra por nodo). "
-                    "Se usarán 26.\n";
+                    "Se usaran 26.\n";
             n = 26;
         }
         red.generarRedAleatoria(n);
@@ -119,7 +112,7 @@ int main() {
         red.cargarDesdeArchivo(archivo);
 
     } else {
-        // Modo manual
+
         int nodos = leerEnteroPositivo("Ingrese cantidad de nodos: ");
         if (nodos > 26) {
             cout << "[Aviso] Maximo 26 nodos. Se usaran 26.\n";
@@ -139,7 +132,7 @@ int main() {
             cout << "[OK] Nodo '" << nodoStr << "' agregado.\n";
         }
 
-        // Agregar conexiones iniciales
+
         cout << "\nAhora agregue conexiones (enlaces) entre nodos.\n";
         while (true) {
             string nodoStr, nodoVecinoStr;
@@ -158,7 +151,7 @@ int main() {
         }
     }
 
-    // ── Menú principal ────────────────────────────────────────────────────────
+
     int opcion = 0;
     while (opcion != 7) {
         cout << "\n--- MENU PRINCIPAL ---\n"
@@ -172,7 +165,7 @@ int main() {
 
         opcion = leerOpcion("Seleccione una opcion: ", 1, 7);
 
-        // 1 ── Agregar nodo ────────────────────────────────────────────────────
+
         if (opcion == 1) {
             string nodoStr;
             while (true) {
@@ -183,7 +176,7 @@ int main() {
             red.agregarEnrutador(nodoStr);
             cout << "[OK] Nodo '" << nodoStr << "' agregado.\n";
 
-            // Pregunta si conectar a un vecino de inmediato
+
             if (!red.enrutadores.empty()) {
                 int conectar = leerOpcion(
                     "¿Conectar a un vecino ahora? Sí (1) / No (2): ", 1, 2);
@@ -201,7 +194,7 @@ int main() {
             }
         }
 
-        // 2 ── Eliminar nodo ───────────────────────────────────────────────────
+
         else if (opcion == 2) {
             if (red.enrutadores.empty()) {
                 cout << "[Aviso] La red esta vacia, no hay nodos que eliminar.\n";
@@ -216,7 +209,7 @@ int main() {
             }
         }
 
-        // 3 ── Calcular costo / ruta ───────────────────────────────────────────
+
         else if (opcion == 3) {
             if (red.enrutadores.size() < 2) {
                 cout << "[Aviso] Se necesitan al menos 2 nodos en la red.\n";
@@ -245,7 +238,7 @@ int main() {
             }
         }
 
-        // 4 ── Cambiar costo de enlace ─────────────────────────────────────────
+
         else if (opcion == 4) {
             if (red.enrutadores.size() < 2) {
                 cout << "[Aviso] Se necesitan al menos 2 nodos en la red.\n";
@@ -256,7 +249,7 @@ int main() {
                                          "Nodo principal: ", "Nodo vecino: ",
                                          nodoStr, nodoVecinoStr)) continue;
 
-            // Verificar que la conexión existe
+
             Enrutador* e = red.enrutadores.at(nodoStr);
             Enrutador* v = red.enrutadores.at(nodoVecinoStr);
             if (e->vecinos.find(v) == e->vecinos.end()) {
@@ -270,7 +263,7 @@ int main() {
             cout << "[OK] Costo actualizado a " << coste << ".\n";
         }
 
-        // 5 ── Eliminar conexión ───────────────────────────────────────────────
+
         else if (opcion == 5) {
             if (red.enrutadores.size() < 2) {
                 cout << "[Aviso] Se necesitan al menos 2 nodos en la red.\n";
@@ -293,7 +286,7 @@ int main() {
             cout << "[OK] Conexion eliminada.\n";
         }
 
-        // 6 ── Mostrar tabla de vecinos ────────────────────────────────────────
+
         else if (opcion == 6) {
             if (red.enrutadores.empty()) {
                 cout << "[Aviso] La red esta vacia.\n";
@@ -302,7 +295,7 @@ int main() {
             }
         }
 
-        // 7 ── Salir ───────────────────────────────────────────────────────────
+
         else if (opcion == 7) {
             cout << "Saliendo...\n";
             break;
